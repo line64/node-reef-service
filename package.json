@@ -1,6 +1,6 @@
 {
   "name": "reef-service",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A nodejs service for the Reef arquitectural pattern",
   "main": "dist/index.js",
   "scripts": {
