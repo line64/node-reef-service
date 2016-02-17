@@ -51,17 +51,42 @@ export default class SqsBrokerFacade extends Emitter{
       console.log('Invalid queue message');
       return;
     }
-
-    let request = {
-      uid: message.MessageAttributes.requestUid.StringValue,
-      reefDialect: message.MessageAttributes.reefDialect.StringValue,
-      queryType: message.MessageAttributes.queryType.StringValue,
-      payload: JSON.parse(message.Body),
-      acknowledge: done
-    };
-
+    
+    let request = this._buildRequestDto(message, done);
     this.emit('request', request);
 
+  }
+
+  _buildRequestDto(message, done){
+    let request; 
+
+    switch (message.MessageAttributes.reefDialect.StringValue) {
+      case 'reef-v1-query':
+        request = {
+          uid: message.MessageAttributes.requestUid.StringValue,
+          reefDialect: message.MessageAttributes.reefDialect.StringValue,
+          queryType: message.MessageAttributes.queryType.StringValue,
+          payload: JSON.parse(message.Body),
+          acknowledge: done
+        }
+        break;
+
+      case 'reef-v1-command':
+        request = {
+          uid: message.MessageAttributes.requestUid.StringValue,
+          reefDialect: message.MessageAttributes.reefDialect.StringValue,
+          commandType: message.MessageAttributes.commandType.StringValue,
+          payload: JSON.parse(message.Body),
+          acknowledge: done
+        }      
+        break;
+    
+      default: 
+          console.error("Unrecognized reefDialect");
+          return;
+    }
+
+    return request;
   }
 
   async _setupRequestConsumer(domain, lane) {

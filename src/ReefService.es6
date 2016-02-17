@@ -65,6 +65,42 @@ export default class ReefService {
 
   }
 
+  async _processCommand(request) {
+
+    console.log('processing command');
+
+    let runner = this._runners[request.commandType];
+
+    if (!runner) {
+      console.log('no runner found for query type');
+      return;
+    }
+
+    let receipt = await runner(request.payload, this);
+
+    console.log('receipt resolved');
+    console.log(receipt);
+
+    let response = {
+      uid: uid(),
+      reefDialect: 'reef-v1-receipt',
+      requestUid: request.uid,
+      payload: receipt
+    };
+
+    console.log('response built');
+    console.log(response);
+
+    console.log('enqueing response');
+    await this._brokerFacade.enqueueResponse(response);
+
+    console.log('acknoledging request');
+
+    request.acknowledge();
+
+  }
+
+
   _onRequest(request) {
 
     console.log('request raised');
