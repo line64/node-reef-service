@@ -122,6 +122,69 @@ var ReefService = (function () {
       };
     })()
   }, {
+    key: '_processCommand',
+    value: (function () {
+      var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(request) {
+        var runner, receipt, response;
+        return _regenerator2.default.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+
+                console.log('processing command');
+
+                runner = this._runners[request.commandType];
+
+                if (runner) {
+                  _context2.next = 5;
+                  break;
+                }
+
+                console.log('no runner found for query type');
+                return _context2.abrupt('return');
+
+              case 5:
+                _context2.next = 7;
+                return runner(request.payload, this);
+
+              case 7:
+                receipt = _context2.sent;
+
+                console.log('receipt resolved');
+                console.log(receipt);
+
+                response = {
+                  uid: (0, _uid2.default)(),
+                  reefDialect: 'reef-v1-receipt',
+                  requestUid: request.uid,
+                  payload: receipt
+                };
+
+                console.log('response built');
+                console.log(response);
+
+                console.log('enqueing response');
+                _context2.next = 16;
+                return this._brokerFacade.enqueueResponse(response);
+
+              case 16:
+
+                console.log('acknoledging request');
+
+                request.acknowledge();
+
+              case 18:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+      return function _processCommand(_x2) {
+        return ref.apply(this, arguments);
+      };
+    })()
+  }, {
     key: '_onRequest',
     value: function _onRequest(request) {
 
@@ -145,35 +208,13 @@ var ReefService = (function () {
   }, {
     key: 'addResolver',
     value: (function () {
-      var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(type, resolver) {
-        return _regenerator2.default.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-
-                this._resolvers[type] = resolver;
-
-              case 1:
-              case 'end':
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-      return function addResolver(_x2, _x3) {
-        return ref.apply(this, arguments);
-      };
-    })()
-  }, {
-    key: 'addRunner',
-    value: (function () {
-      var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(type, runner) {
+      var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(type, resolver) {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
 
-                this._runners[type] = runner;
+                this._resolvers[type] = resolver;
 
               case 1:
               case 'end':
@@ -182,7 +223,29 @@ var ReefService = (function () {
           }
         }, _callee3, this);
       }));
-      return function addRunner(_x4, _x5) {
+      return function addResolver(_x3, _x4) {
+        return ref.apply(this, arguments);
+      };
+    })()
+  }, {
+    key: 'addRunner',
+    value: (function () {
+      var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(type, runner) {
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+
+                this._runners[type] = runner;
+
+              case 1:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+      return function addRunner(_x5, _x6) {
         return ref.apply(this, arguments);
       };
     })()
