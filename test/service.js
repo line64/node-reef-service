@@ -9,7 +9,7 @@ var brokerFacade = new SqsBrokerFacade({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   serviceDomain: 'service-mock',
   serviceLane: 'shared',
-  clientDomain: 'stress-tester',
+  clientDomain: 'client-test',
   clientLane: 'instance001'
 });
 
