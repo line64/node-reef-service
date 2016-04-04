@@ -30,6 +30,22 @@ sabreService.addResolver('echo-data', (params) => {
 
 });
 
+
+sabreService.addRunner('receive-data', (params) => {
+
+  return new Promise((resolve, reject) => {
+
+    console.log('receive-data request');
+
+    setTimeout(function () {
+      console.log('timeout done');
+      resolve({ success: true });
+    }, params.sleep);
+
+  });
+
+});
+
 sabreService
   .setup()
   .then(function () {
