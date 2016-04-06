@@ -79,7 +79,7 @@ var ReefService = function () {
                 }
 
                 console.log('no resolver found for query type');
-                request.acknowledge(new Error('no runner found for query type'));
+                request.acknowledge(new Error('no resolver found for query type'));
                 return _context.abrupt('return');
 
               case 6:
