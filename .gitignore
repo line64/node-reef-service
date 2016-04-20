@@ -28,3 +28,6 @@ node_modules
 
 # Test environment
 .env
+
+# Build files
+dist
