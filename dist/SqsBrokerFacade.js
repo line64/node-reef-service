@@ -127,6 +127,8 @@ var SqsBrokerFacade = (function (_Emitter) {
             uid: message.MessageAttributes.requestUid.StringValue,
             reefDialect: message.MessageAttributes.reefDialect.StringValue,
             queryType: message.MessageAttributes.queryType.StringValue,
+            replyToDomain: message.MessageAttributes.replyToDomain.StringValue,
+            replyToLane: message.MessageAttributes.replyToLane.StringValue,
             payload: JSON.parse(message.Body),
             acknowledge: done
           };
@@ -137,6 +139,8 @@ var SqsBrokerFacade = (function (_Emitter) {
             uid: message.MessageAttributes.requestUid.StringValue,
             reefDialect: message.MessageAttributes.reefDialect.StringValue,
             commandType: message.MessageAttributes.commandType.StringValue,
+            replyToDomain: message.MessageAttributes.replyToDomain.StringValue,
+            replyToLane: message.MessageAttributes.replyToLane.StringValue,
             payload: JSON.parse(message.Body),
             acknowledge: done
           };
@@ -236,13 +240,8 @@ var SqsBrokerFacade = (function (_Emitter) {
 
               case 2:
                 this._requestConsumer = _context3.sent;
-                _context3.next = 5;
-                return this._setupResponseProducer(this._options.clientDomain, this._options.clientLane);
 
-              case 5:
-                this._responseProducer = _context3.sent;
-
-              case 6:
+              case 3:
               case 'end':
                 return _context3.stop();
             }
@@ -267,26 +266,44 @@ var SqsBrokerFacade = (function (_Emitter) {
     }
   }, {
     key: 'enqueueResponse',
-    value: function enqueueResponse(response) {
-      var _this4 = this;
+    value: (function () {
+      var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(response) {
+        var message, responseProducer;
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                message = {
+                  id: response.uid,
+                  body: (0, _stringify2.default)(response.payload),
+                  messageAttributes: {
+                    reefDialect: { DataType: 'String', StringValue: response.reefDialect },
+                    requestUid: { DataType: 'String', StringValue: response.requestUid }
+                  }
+                };
+                _context4.next = 3;
+                return this._setupResponseProducer(response.domain, response.lane);
 
-      return new _promise2.default(function (resolve, reject) {
+              case 3:
+                responseProducer = _context4.sent;
+                return _context4.abrupt('return', new _promise2.default(function (resolve, reject) {
+                  responseProducer.send([message], function (err) {
+                    if (err) reject(err);
+                    resolve();
+                  });
+                }));
 
-        var message = {
-          id: response.uid,
-          body: (0, _stringify2.default)(response.payload),
-          messageAttributes: {
-            reefDialect: { DataType: 'String', StringValue: response.reefDialect },
-            requestUid: { DataType: 'String', StringValue: response.requestUid }
+              case 5:
+              case 'end':
+                return _context4.stop();
+            }
           }
-        };
-
-        _this4._responseProducer.send([message], function (err) {
-          if (err) reject(err);
-          resolve();
-        });
-      });
-    }
+        }, _callee4, this);
+      }));
+      return function enqueueResponse(_x5) {
+        return ref.apply(this, arguments);
+      };
+    })()
   }]);
   return SqsBrokerFacade;
 })(_events2.default);

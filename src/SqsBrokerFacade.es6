@@ -51,14 +51,14 @@ export default class SqsBrokerFacade extends Emitter{
       console.log('Invalid queue message');
       return;
     }
-    
+
     let request = this._buildRequestDto(message, done);
     this.emit('request', request);
 
   }
 
   _buildRequestDto(message, done){
-    let request; 
+    let request;
 
     switch (message.MessageAttributes.reefDialect.StringValue) {
       case 'reef-v1-query':
@@ -66,6 +66,8 @@ export default class SqsBrokerFacade extends Emitter{
           uid: message.MessageAttributes.requestUid.StringValue,
           reefDialect: message.MessageAttributes.reefDialect.StringValue,
           queryType: message.MessageAttributes.queryType.StringValue,
+          replyToDomain: message.MessageAttributes.replyToDomain.StringValue,
+          replyToLane: message.MessageAttributes.replyToLane.StringValue,
           payload: JSON.parse(message.Body),
           acknowledge: done
         }
@@ -76,12 +78,14 @@ export default class SqsBrokerFacade extends Emitter{
           uid: message.MessageAttributes.requestUid.StringValue,
           reefDialect: message.MessageAttributes.reefDialect.StringValue,
           commandType: message.MessageAttributes.commandType.StringValue,
+          replyToDomain: message.MessageAttributes.replyToDomain.StringValue,
+          replyToLane: message.MessageAttributes.replyToLane.StringValue,
           payload: JSON.parse(message.Body),
           acknowledge: done
-        }      
+        }
         break;
-    
-      default: 
+
+      default:
           console.error("Unrecognized reefDialect");
           return;
     }
@@ -126,8 +130,6 @@ export default class SqsBrokerFacade extends Emitter{
 
     this._requestConsumer = await this._setupRequestConsumer(this._options.serviceDomain, this._options.serviceLane);
 
-    this._responseProducer = await this._setupResponseProducer(this._options.clientDomain, this._options.clientLane);
-
   }
 
   start() {
@@ -142,24 +144,24 @@ export default class SqsBrokerFacade extends Emitter{
 
   }
 
-  enqueueResponse(response) {
+  async enqueueResponse(response) {
+
+    let message = {
+      id: response.uid,
+      body: JSON.stringify(response.payload),
+      messageAttributes: {
+        reefDialect: { DataType: 'String', StringValue: response.reefDialect },
+        requestUid: { DataType: 'String', StringValue: response.requestUid }
+      }
+    };
+
+    let responseProducer = await this._setupResponseProducer(response.domain, response.lane);
 
     return new Promise((resolve, reject) => {
-
-      let message = {
-        id: response.uid,
-        body: JSON.stringify(response.payload),
-        messageAttributes: {
-          reefDialect: { DataType: 'String', StringValue: response.reefDialect },
-          requestUid: { DataType: 'String', StringValue: response.requestUid }
-        }
-      };
-
-      this._responseProducer.send([message], function(err) {
+      responseProducer.send([message], function(err) {
         if (err) reject(err);
         resolve();
       });
-
     });
 
   }

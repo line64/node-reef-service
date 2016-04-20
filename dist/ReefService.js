@@ -94,6 +94,8 @@ var ReefService = (function () {
                   uid: (0, _uid2.default)(),
                   reefDialect: 'reef-v1-answer',
                   requestUid: request.uid,
+                  domain: request.replyToDomain,
+                  lane: request.replyToLane,
                   payload: answer
                 };
 
@@ -157,6 +159,8 @@ var ReefService = (function () {
                   uid: (0, _uid2.default)(),
                   reefDialect: 'reef-v1-receipt',
                   requestUid: request.uid,
+                  domain: request.replyToDomain,
+                  lane: request.replyToLane,
                   payload: receipt
                 };
 

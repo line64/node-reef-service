@@ -8,9 +8,7 @@ var brokerFacade = new SqsBrokerFacade({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   serviceDomain: 'service-mock',
-  serviceLane: 'shared',
-  clientDomain: 'client-test',
-  clientLane: 'instance001'
+  serviceLane: 'shared'
 });
 
 var sabreService = new ReefService(brokerFacade);
