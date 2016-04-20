@@ -26,9 +26,10 @@ var _uid2 = _interopRequireDefault(_uid);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ReefService = (function () {
+var ReefService = function () {
   function ReefService(brokerFacade) {
     (0, _classCallCheck3.default)(this, ReefService);
+
 
     this._brokerFacade = brokerFacade;
     this._runners = {};
@@ -60,7 +61,7 @@ var ReefService = (function () {
     }
   }, {
     key: '_processQuery',
-    value: (function () {
+    value: function () {
       var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(request) {
         var resolver, answer, response;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -73,19 +74,21 @@ var ReefService = (function () {
                 resolver = this._resolvers[request.queryType];
 
                 if (resolver) {
-                  _context.next = 5;
+                  _context.next = 6;
                   break;
                 }
 
                 console.log('no resolver found for query type');
+                request.acknowledge(new Error('no resolver found for query type'));
                 return _context.abrupt('return');
 
-              case 5:
-                _context.next = 7;
+              case 6:
+                _context.next = 8;
                 return resolver(request.payload);
 
-              case 7:
+              case 8:
                 answer = _context.sent;
+
 
                 console.log('answer resolved');
                 console.log(answer);
@@ -99,33 +102,37 @@ var ReefService = (function () {
                   payload: answer
                 };
 
+
                 console.log('response built');
                 console.log(response);
 
                 console.log('enqueing response');
-                _context.next = 16;
+                _context.next = 17;
                 return this._brokerFacade.enqueueResponse(response);
 
-              case 16:
+              case 17:
 
                 console.log('acknoledging request');
 
                 request.acknowledge();
 
-              case 18:
+              case 19:
               case 'end':
                 return _context.stop();
             }
           }
         }, _callee, this);
       }));
-      return function _processQuery(_x) {
+
+      function _processQuery(_x) {
         return ref.apply(this, arguments);
-      };
-    })()
+      }
+
+      return _processQuery;
+    }()
   }, {
     key: '_processCommand',
-    value: (function () {
+    value: function () {
       var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(request) {
         var runner, receipt, response;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -138,19 +145,21 @@ var ReefService = (function () {
                 runner = this._runners[request.commandType];
 
                 if (runner) {
-                  _context2.next = 5;
+                  _context2.next = 6;
                   break;
                 }
 
                 console.log('no runner found for query type');
+                request.acknowledge(new Error('no runner found for query type'));
                 return _context2.abrupt('return');
 
-              case 5:
-                _context2.next = 7;
+              case 6:
+                _context2.next = 8;
                 return runner(request.payload, this);
 
-              case 7:
+              case 8:
                 receipt = _context2.sent;
+
 
                 console.log('receipt resolved');
                 console.log(receipt);
@@ -164,30 +173,34 @@ var ReefService = (function () {
                   payload: receipt
                 };
 
+
                 console.log('response built');
                 console.log(response);
 
                 console.log('enqueing response');
-                _context2.next = 16;
+                _context2.next = 17;
                 return this._brokerFacade.enqueueResponse(response);
 
-              case 16:
+              case 17:
 
                 console.log('acknoledging request');
 
                 request.acknowledge();
 
-              case 18:
+              case 19:
               case 'end':
                 return _context2.stop();
             }
           }
         }, _callee2, this);
       }));
-      return function _processCommand(_x2) {
+
+      function _processCommand(_x2) {
         return ref.apply(this, arguments);
-      };
-    })()
+      }
+
+      return _processCommand;
+    }()
   }, {
     key: '_onRequest',
     value: function _onRequest(request) {
@@ -211,7 +224,7 @@ var ReefService = (function () {
     }
   }, {
     key: 'addResolver',
-    value: (function () {
+    value: function () {
       var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(type, resolver) {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
           while (1) {
@@ -227,13 +240,16 @@ var ReefService = (function () {
           }
         }, _callee3, this);
       }));
-      return function addResolver(_x3, _x4) {
+
+      function addResolver(_x3, _x4) {
         return ref.apply(this, arguments);
-      };
-    })()
+      }
+
+      return addResolver;
+    }()
   }, {
     key: 'addRunner',
-    value: (function () {
+    value: function () {
       var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(type, runner) {
         return _regenerator2.default.wrap(function _callee4$(_context4) {
           while (1) {
@@ -249,15 +265,18 @@ var ReefService = (function () {
           }
         }, _callee4, this);
       }));
-      return function addRunner(_x5, _x6) {
+
+      function addRunner(_x5, _x6) {
         return ref.apply(this, arguments);
-      };
-    })()
+      }
+
+      return addRunner;
+    }()
   }, {
     key: 'listen',
     value: function listen(event, callback) {}
   }]);
   return ReefService;
-})();
+}();
 
 exports.default = ReefService;

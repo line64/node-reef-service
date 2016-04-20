@@ -58,7 +58,7 @@ var _awsSdk2 = _interopRequireDefault(_awsSdk);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SqsBrokerFacade = (function (_Emitter) {
+var SqsBrokerFacade = function (_Emitter) {
   (0, _inherits3.default)(SqsBrokerFacade, _Emitter);
 
   function SqsBrokerFacade(options) {
@@ -119,7 +119,7 @@ var SqsBrokerFacade = (function (_Emitter) {
   }, {
     key: '_buildRequestDto',
     value: function _buildRequestDto(message, done) {
-      var request = undefined;
+      var request = void 0;
 
       switch (message.MessageAttributes.reefDialect.StringValue) {
         case 'reef-v1-query':
@@ -155,7 +155,7 @@ var SqsBrokerFacade = (function (_Emitter) {
     }
   }, {
     key: '_setupRequestConsumer',
-    value: (function () {
+    value: function () {
       var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(domain, lane) {
         var _this3 = this;
 
@@ -179,6 +179,7 @@ var SqsBrokerFacade = (function (_Emitter) {
                   }
                 });
 
+
                 consumer.on('error', function (err) {
                   console.log(err.message);
                 });
@@ -192,13 +193,16 @@ var SqsBrokerFacade = (function (_Emitter) {
           }
         }, _callee, this);
       }));
-      return function _setupRequestConsumer(_x, _x2) {
+
+      function _setupRequestConsumer(_x, _x2) {
         return ref.apply(this, arguments);
-      };
-    })()
+      }
+
+      return _setupRequestConsumer;
+    }()
   }, {
     key: '_setupResponseProducer',
-    value: (function () {
+    value: function () {
       var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(domain, lane) {
         var queueUrl, producer;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -223,13 +227,16 @@ var SqsBrokerFacade = (function (_Emitter) {
           }
         }, _callee2, this);
       }));
-      return function _setupResponseProducer(_x3, _x4) {
+
+      function _setupResponseProducer(_x3, _x4) {
         return ref.apply(this, arguments);
-      };
-    })()
+      }
+
+      return _setupResponseProducer;
+    }()
   }, {
     key: 'setup',
-    value: (function () {
+    value: function () {
       var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
           while (1) {
@@ -248,10 +255,13 @@ var SqsBrokerFacade = (function (_Emitter) {
           }
         }, _callee3, this);
       }));
-      return function setup() {
+
+      function setup() {
         return ref.apply(this, arguments);
-      };
-    })()
+      }
+
+      return setup;
+    }()
   }, {
     key: 'start',
     value: function start() {
@@ -306,6 +316,6 @@ var SqsBrokerFacade = (function (_Emitter) {
     })()
   }]);
   return SqsBrokerFacade;
-})(_events2.default);
+}(_events2.default);
 
 exports.default = SqsBrokerFacade;
