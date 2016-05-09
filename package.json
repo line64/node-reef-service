@@ -1,5 +1,5 @@
 {
-  "name": "reef-service",
+  "name": "@line64/reef-service",
   "version": "1.0.0-beta.1",
   "description": "A nodejs service for the Reef arquitectural pattern",
   "main": "dist/index.js",
