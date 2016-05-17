@@ -151,7 +151,8 @@ export default class SqsBrokerFacade extends Emitter{
       body: JSON.stringify(response.payload),
       messageAttributes: {
         reefDialect: { DataType: 'String', StringValue: response.reefDialect },
-        requestUid: { DataType: 'String', StringValue: response.requestUid }
+        requestUid: { DataType: 'String', StringValue: response.requestUid },
+        status: response.status
       }
     };
 

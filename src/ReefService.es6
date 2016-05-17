@@ -1,4 +1,5 @@
 import uid from 'uid';
+import ResponseStatus from './ResponseStatus';
 
 export default class ReefService {
 
@@ -42,7 +43,19 @@ export default class ReefService {
       return;
     }
 
-    let answer = await resolver(request.payload);
+    let answer = null,
+        status = null;
+
+    try{
+        answer = await runner(request.payload, this);
+        status = ResponseStatus.SUCCESS;
+    }
+    catch(err){
+        console.log("Warning - Error in aplication");
+        answer = JSON.stringify(err, Object.getOwnPropertyNames(err));;
+        status = ResponseStatus.INTERNAL_ERROR;
+    }
+
 
     console.log('answer resolved');
     console.log(answer);
@@ -53,7 +66,8 @@ export default class ReefService {
       requestUid: request.uid,
       domain: request.replyToDomain,
       lane: request.replyToLane,
-      payload: answer
+      payload: answer,
+      status: status
     };
 
     console.log('response built');
@@ -80,10 +94,21 @@ export default class ReefService {
       return;
     }
 
-    let receipt = await runner(request.payload, this);
+    let payload = null,
+        status = null;
 
-    console.log('receipt resolved');
-    console.log(receipt);
+    try{
+        payload = await runner(request.payload, this);
+        status = ResponseStatus.SUCCESS;
+    }
+    catch(err){
+        console.log("Warning - Error in aplication");
+        payload = JSON.stringify(err, Object.getOwnPropertyNames(err));
+        status = ResponseStatus.INTERNAL_ERROR;
+    }
+
+    console.log('payload resolved');
+    console.log(payload);
 
     let response = {
       uid: uid(),
@@ -91,7 +116,8 @@ export default class ReefService {
       requestUid: request.uid,
       domain: request.replyToDomain,
       lane: request.replyToLane,
-      payload: receipt
+      payload: payload,
+      status: status
     };
 
     console.log('response built');
