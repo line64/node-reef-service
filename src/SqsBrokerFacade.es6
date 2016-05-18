@@ -152,7 +152,7 @@ export default class SqsBrokerFacade extends Emitter{
       messageAttributes: {
         reefDialect: { DataType: 'String', StringValue: response.reefDialect },
         requestUid: { DataType: 'String', StringValue: response.requestUid },
-        status: { DataType: 'Number', StringValue: response.status }
+        status: { DataType: 'String', StringValue: response.status }
       }
     };
 
@@ -160,7 +160,6 @@ export default class SqsBrokerFacade extends Emitter{
 
     return new Promise((resolve, reject) => {
       responseProducer.send([message], function(err) {
-          console.log(err);
         if (err) reject(err);
         resolve();
       });

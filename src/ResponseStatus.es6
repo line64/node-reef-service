@@ -1,4 +1,4 @@
 export default {
-    SUCCESS: 0,
-    INTERNAL_ERROR: 1
+    SUCCESS: "SUCCESS",
+    INTERNAL_ERROR: "INTERNAL_ERROR"
 };
