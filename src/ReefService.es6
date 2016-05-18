@@ -103,7 +103,7 @@ export default class ReefService {
     }
     catch(err){
         console.log("Warning - Error in aplication");
-        payload = JSON.stringify(err, Object.getOwnPropertyNames(err));
+        payload = {message: err.message, stack: err.stack};
         status = ResponseStatus.INTERNAL_ERROR;
     }
 
