@@ -9,6 +9,7 @@ export default class ReefService extends EventEmitter {
     super();
 
     this._brokerFacade = brokerFacade;
+    this._brokerFacedeName = brokerFacade.constructor.name;
     this._runners = {};
     this._resolvers = {};
 
@@ -18,9 +19,9 @@ export default class ReefService extends EventEmitter {
 
     this._brokerFacade.on('request', (req) => this._onRequest(req));
 
-    this._brokerFacade.on('info', (info) => this.emit(info));
+    this._brokerFacade.on('info', (info) => this.emit('info', {Facade: info}));
 
-    this._brokerFacade.on('error', (error) => this.emit(error));
+    this._brokerFacade.on('error', (error) => this.emit('error', {Facade: error}));
 
     return this._brokerFacade.setup();
 
