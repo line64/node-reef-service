@@ -43,17 +43,17 @@ export default class SqsBrokerFacade extends Emitter{
 
   _handleRequestMessage(message, done) {
 
-    console.log('Handling new request message');
+    this.emit('info', 'Handling new request message');
 
     let isValid = this._validateRequestMessage(message);
 
     if (!isValid) {
-      console.log('Invalid queue message');
+      this.emit('info', 'Invalid queue message');
       return;
     }
 
     let request = this._buildRequestDto(message, done);
-    this.emit('request', request);
+    this.emit('info', `request: ${request}`);
 
   }
 
@@ -86,7 +86,7 @@ export default class SqsBrokerFacade extends Emitter{
         break;
 
       default:
-          console.error("Unrecognized reefDialect");
+          this.emit('error', 'Unrecognized reefDialect');
           return;
     }
 
@@ -106,7 +106,7 @@ export default class SqsBrokerFacade extends Emitter{
     });
 
     consumer.on('error', function (err) {
-      console.log(err.message);
+      this.emit('error', err.message);
     });
 
     return consumer;

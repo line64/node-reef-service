@@ -1,9 +1,12 @@
 import uid from 'uid';
 import ResponseStatus from './ResponseStatus';
+import Emitter from 'events';
 
-export default class ReefService {
+export default class ReefService extends Emitter {
 
   constructor(brokerFacade) {
+
+    super();
 
     this._brokerFacade = brokerFacade;
     this._runners = {};
@@ -33,12 +36,12 @@ export default class ReefService {
 
   async _processQuery(request) {
 
-    console.log('processing query');
+    this.emit('info', 'processing query');
 
     let resolver = this._resolvers[request.queryType];
 
     if (!resolver) {
-      console.log('no resolver found for query type');
+      this.emit('info', 'no resolver found for query type');
       request.acknowledge(new Error('no resolver found for query type'));
       return;
     }
@@ -51,14 +54,13 @@ export default class ReefService {
         status = ResponseStatus.SUCCESS;
     }
     catch(err){
-        console.log("Warning - Error in aplication");
+        this.emit('error','Warning - Error in aplication');
         answer = JSON.stringify(err, Object.getOwnPropertyNames(err));;
         status = ResponseStatus.INTERNAL_ERROR;
     }
 
 
-    console.log('answer resolved');
-    console.log(answer);
+    this.emit('info', `answer resolved: ${answer}`);
 
     let response = {
       uid: uid(),
@@ -70,13 +72,12 @@ export default class ReefService {
       status: status
     };
 
-    console.log('response built');
-    console.log(response);
+    this.emit('info', `response built: ${response}`);
 
-    console.log('enqueing response');
+    this.emit('info', 'enqueing response');
     await this._brokerFacade.enqueueResponse(response);
 
-    console.log('acknoledging request');
+    this.emit('info', 'acknoledging request');
 
     request.acknowledge();
 
@@ -84,12 +85,12 @@ export default class ReefService {
 
   async _processCommand(request) {
 
-    console.log('processing command');
+    this.emit('info', 'processing command');
 
     let runner = this._runners[request.commandType];
 
     if (!runner) {
-      console.log('no runner found for query type');
+      this.emit('error', `no runner found for query type: ${request}`);
       request.acknowledge(new Error('no runner found for query type'));
       return;
     }
@@ -102,13 +103,12 @@ export default class ReefService {
         status = ResponseStatus.SUCCESS;
     }
     catch(err){
-        console.log("Warning - Error in aplication");
+        this.emit('info', 'Warning - Error in aplication');
         payload = {message: err.message, stack: err.stack};
         status = ResponseStatus.INTERNAL_ERROR;
     }
 
-    console.log('payload resolved');
-    console.log(payload);
+    this.emit('info', `payload resolved: + ${payload}`);
 
     let response = {
       uid: uid(),
@@ -120,13 +120,12 @@ export default class ReefService {
       status: status
     };
 
-    console.log('response built');
-    console.log(response);
+    this.emit('info', `response built: ${response}`);
 
-    console.log('enqueing response');
+    this.emit('info', 'enqueing response');
     await this._brokerFacade.enqueueResponse(response);
 
-    console.log('acknoledging request');
+    this.emit('info', 'acknoledging request');
 
     request.acknowledge();
 
@@ -135,7 +134,7 @@ export default class ReefService {
 
   _onRequest(request) {
 
-    console.log('request raised');
+    this.emit('info', 'request raised');
 
     switch (request.reefDialect) {
 
