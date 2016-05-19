@@ -1,8 +1,8 @@
 import uid from 'uid';
 import ResponseStatus from './ResponseStatus';
-import Emitter from 'events';
+import EventEmitter from 'events';
 
-export default class ReefService extends Emitter {
+export default class ReefService extends EventEmitter {
 
   constructor(brokerFacade) {
 
@@ -150,7 +150,6 @@ export default class ReefService extends Emitter {
         throw new Error('Cant understand reef dialog');
 
     }
-
   }
 
   async addResolver(type, resolver) {

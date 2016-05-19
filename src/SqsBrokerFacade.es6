@@ -1,9 +1,9 @@
-import Emitter from 'events';
+import EventEmitter from 'events';
 import Consumer from 'sqs-consumer';
 import Producer from 'sqs-producer';
 import AWS from 'aws-sdk';
 
-export default class SqsBrokerFacade extends Emitter{
+export default class SqsBrokerFacade extends EventEmitter{
 
   constructor(options) {
 
@@ -53,7 +53,7 @@ export default class SqsBrokerFacade extends Emitter{
     }
 
     let request = this._buildRequestDto(message, done);
-    this.emit('info', `request: ${request}`);
+    this.emit('request', request);
 
   }
 
