@@ -55,7 +55,7 @@ export default class ReefService extends EventEmitter {
         status = null;
 
     try{
-        answer = await runner(request.payload, this);
+        answer = await resolver(request.payload, this);
         status = ResponseStatus.SUCCESS;
     }
     catch(err){
