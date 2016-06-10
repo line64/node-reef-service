@@ -45,39 +45,32 @@ export default class ReefService extends EventEmitter {
 
     let resolver = this._resolvers[request.queryType];
 
-    if (!resolver) {
-      this.emit('info', 'No resolver found for query type');
-      request.acknowledge(new Error('No resolver found for query type'));
-      return;
-    }
-
-    let answer = null,
-        status = null;
-
-    try{
-        answer = await resolver(request.payload, this);
-        status = ResponseStatus.SUCCESS;
-    }
-    catch(err){
-        this.emit('error','Warning - Error in resolver');
-        answer = JSON.stringify(err, Object.getOwnPropertyNames(err));;
-        status = ResponseStatus.INTERNAL_ERROR;
-    }
-
-
-    this.emit('info', {AnswerResolved: answer});
-
     let response = {
       uid: uid(),
       reefDialect: 'reef-v1-answer',
       requestUid: request.uid,
       domain: request.replyToDomain,
       lane: request.replyToLane,
-      payload: answer,
-      status: status
+      payload: null,
+      status: null
     };
 
-    this.emit('info', {ResponseBuilt: response});
+    try{
+        if (!resolver) {
+            this.emit('info', 'No resolver found for query type');
+            throw {message: 'No resolver found for query type'};
+        }
+        response.payload = await resolver(request.payload, this);
+        response.status = ResponseStatus.SUCCESS;
+    }
+    catch(err){
+        this.emit('error','Warning - Error in resolver');
+        response.payload = err;
+        response.status = ResponseStatus.INTERNAL_ERROR;
+    }
+
+    this.emit('info', `Response built for: ${JSON.stringify(request)}`);
+    this.emit('info', `Response built: ${JSON.stringify(response)}`);
 
     this.emit('info', 'Enqueing response');
     await this._brokerFacade.enqueueResponse(response);
@@ -94,38 +87,33 @@ export default class ReefService extends EventEmitter {
 
     let runner = this._runners[request.commandType];
 
-    if (!runner) {
-      this.emit('error', `No runner found for query type: ${JSON.stringify(request)}`);
-      request.acknowledge(new Error('No runner found for query type'));
-      return;
-    }
-
-    let payload = null,
-        status = null;
-
-    try{
-        payload = await runner(request.payload, this);
-        status = ResponseStatus.SUCCESS;
-    }
-    catch(err){
-        this.emit('error', 'Warning - Error in runner');
-        payload = {message: err.message, stack: err.stack};
-        status = ResponseStatus.INTERNAL_ERROR;
-    }
-
-    this.emit('info', `Payload resolved: ${JSON.stringify(payload)}`);
-
     let response = {
       uid: uid(),
       reefDialect: 'reef-v1-receipt',
       requestUid: request.uid,
       domain: request.replyToDomain,
       lane: request.replyToLane,
-      payload: payload,
-      status: status
+      payload: null,
+      status: null
     };
 
-    this.emit('info', `Response built: ${JSON.stringify(request)}`);
+    try{
+        if (!runner) {
+            this.emit('info', 'No runner found for command type');
+            throw {message: 'No runner found for command type'};
+        }
+        response.payload = await runner(request.payload, this);
+        response.status = ResponseStatus.SUCCESS;
+    }
+    catch(err){
+        this.emit('error','Warning - Error in resolver');
+        response.payload = err;
+        response.status = ResponseStatus.INTERNAL_ERROR;
+    }
+
+    this.emit('info', `Response built for: ${JSON.stringify(request)}`);
+    this.emit('info', `Response built: ${JSON.stringify(response)}`);
+
 
     this.emit('info', 'Enqueing response');
     await this._brokerFacade.enqueueResponse(response);
