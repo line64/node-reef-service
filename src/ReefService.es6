@@ -108,6 +108,8 @@ export default class ReefService extends EventEmitter {
     }
 
     if ( request.receiptType == ReceiptType.FIRE_AND_FORGET){
+        this.emit('info', 'Processing fire and forget');
+
         if( status == ResponseStatus.SUCCESS || !runner ){
             return request.acknowledge();
         }

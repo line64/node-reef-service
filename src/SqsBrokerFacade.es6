@@ -19,6 +19,8 @@ export default class SqsBrokerFacade extends EventEmitter{
       secretAccessKey: options.secretAccessKey
     });
 
+    this._producers = {};
+
   }
 
   _ensureQueue(name) {
@@ -109,7 +111,7 @@ export default class SqsBrokerFacade extends EventEmitter{
     });
 
     consumer.on('error', function (err) {
-      this.emit('error', err.message);
+      this.emit('error', err ? err.message : "UNKNOWN_ERROR");
     });
 
     return consumer;
@@ -118,14 +120,24 @@ export default class SqsBrokerFacade extends EventEmitter{
 
   async _setupResponseProducer(domain, lane) {
 
-    let queueUrl = await this._ensureQueue(`${domain}-${lane}-res`);
+    let queueName = `${domain}-${lane}-res`;
 
-    let producer = Producer.create({
-      sqs: this._sqs,
-      queueUrl: queueUrl
+    if( this._producers[queueName] ){
+        return Promise.resolve(this._producers[queueName]);
+    }
+
+    this._producers[queueName] = new Promise( async (resolve, reject) => {
+
+        let queueUrl = await this._ensureQueue(queueName);
+
+        let producer = Producer.create({
+          sqs: this._sqs,
+          queueUrl: queueUrl
+        });
+
+        resolve(producer);
+
     });
-
-    return producer;
 
   }
 
