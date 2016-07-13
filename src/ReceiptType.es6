@@ -1,0 +1,4 @@
+export default {
+    FIRE_AND_FORGET: "FIRE_AND_FORGET",
+    EXPECT_RECEIPT: "EXPECT_RECEIPT"
+};

@@ -2,6 +2,8 @@ import uid from 'uid';
 import ResponseStatus from './ResponseStatus';
 import EventEmitter from 'events';
 
+import ReceiptType from './ReceiptType';
+
 export default class ReefService extends EventEmitter {
 
   constructor(brokerFacade) {
@@ -87,31 +89,42 @@ export default class ReefService extends EventEmitter {
 
     let runner = this._runners[request.commandType];
 
-    let response = {
-      uid: uid(),
-      reefDialect: 'reef-v1-receipt',
-      requestUid: request.uid,
-      domain: request.replyToDomain,
-      lane: request.replyToLane,
-      payload: null,
-      status: null
-    };
+    let status,
+        payload;
 
     try{
         if (!runner) {
             this.emit('info', 'No runner found for command type');
             throw {message: 'No runner found for command type'};
         }
-        response.payload = await runner(request.payload, this);
-        response.status = ResponseStatus.SUCCESS;
+        payload = await runner(request.payload, this);
+        status = ResponseStatus.SUCCESS;
     }
     catch(err){
         this.emit('error','Warning - Error in resolver');
-        response.payload = err;
-        response.status = ResponseStatus.INTERNAL_ERROR;
+        this.emit('error',err);
+        payload = err;
+        status = ResponseStatus.INTERNAL_ERROR;
     }
 
-    this.emit('info', `Response built for: ${JSON.stringify(request)}`);
+    if ( request.receiptType == ReceiptType.FIRE_AND_FORGET){
+        if( status == ResponseStatus.SUCCESS || !runner ){
+            return request.acknowledge();
+        }
+        return request.acknowledge(new Error());
+    }
+
+    let response = {
+      uid: uid(),
+      reefDialect: 'reef-v1-receipt',
+      requestUid: request.uid,
+      domain: request.replyToDomain,
+      lane: request.replyToLane,
+      payload: payload,
+      status: status
+    };
+
+    this.emit('info', `Response built for request: ${JSON.stringify(request)}`);
     this.emit('info', `Response built: ${JSON.stringify(response)}`);
 
 

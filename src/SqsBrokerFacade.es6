@@ -3,6 +3,8 @@ import Consumer from 'sqs-consumer';
 import Producer from 'sqs-producer';
 import AWS from 'aws-sdk';
 
+import ReceiptType from './ReceiptType';
+
 export default class SqsBrokerFacade extends EventEmitter{
 
   constructor(options) {
@@ -70,7 +72,7 @@ export default class SqsBrokerFacade extends EventEmitter{
           replyToLane: message.MessageAttributes.replyToLane.StringValue,
           payload: JSON.parse(message.Body),
           acknowledge: done
-        }
+      };
         break;
 
       case 'reef-v1-command':
@@ -80,9 +82,10 @@ export default class SqsBrokerFacade extends EventEmitter{
           commandType: message.MessageAttributes.commandType.StringValue,
           replyToDomain: message.MessageAttributes.replyToDomain.StringValue,
           replyToLane: message.MessageAttributes.replyToLane.StringValue,
+          receiptType: message.MessageAttributes.receiptType ? message.MessageAttributes.receiptType.StringValue : ReceiptType.EXPECT_RECEIPT,
           payload: JSON.parse(message.Body),
           acknowledge: done
-        }
+      };
         break;
 
       default:
