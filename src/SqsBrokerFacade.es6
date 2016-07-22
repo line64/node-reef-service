@@ -122,22 +122,23 @@ export default class SqsBrokerFacade extends EventEmitter{
 
     let queueName = `${domain}-${lane}-res`;
 
-    if( this._producers[queueName] ){
-        return Promise.resolve(this._producers[queueName]);
-    }
+    if( !this._producers[queueName] ){
 
-    this._producers[queueName] = new Promise( async (resolve, reject) => {
+        this._producers[queueName] = new Promise( async (resolve, reject) => {
 
-        let queueUrl = await this._ensureQueue(queueName);
+            let queueUrl = await this._ensureQueue(queueName);
 
-        let producer = Producer.create({
-          sqs: this._sqs,
-          queueUrl: queueUrl
+            let producer = Producer.create({
+              sqs: this._sqs,
+              queueUrl: queueUrl
+            });
+
+            resolve(producer);
+
         });
-
-        resolve(producer);
-
-    });
+    }
+    
+    return this._producers[queueName];
 
   }
 
