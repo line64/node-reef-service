@@ -23,6 +23,8 @@ export default class ReefService extends EventEmitter {
 
     this._brokerFacade.on('info', info => this.emit('info', {Facade: info}));
 
+    this._brokerFacade.on('warn', warn => this.emit('warn', {Facade: warn}));
+
     this._brokerFacade.on('error', error => this.emit('warn', {Facade: error}));
 
     return this._brokerFacade.setup();
@@ -44,6 +46,7 @@ export default class ReefService extends EventEmitter {
   async _processQuery(request) {
 
     this.emit('info', 'Processing query');
+    this.emit('request', request);
 
     let resolver = this._resolvers[request.queryType];
 
@@ -87,6 +90,7 @@ export default class ReefService extends EventEmitter {
   async _processCommand(request) {
 
     this.emit('info', 'Processing command');
+    this.emit('request', request);
 
     let runner = this._runners[request.commandType];
 
@@ -110,14 +114,15 @@ export default class ReefService extends EventEmitter {
         status = ResponseStatus.INTERNAL_ERROR;
     }
 
+
     if ( request.receiptType == ReceiptType.FIRE_AND_FORGET){
         this.emit('info', 'Processing fire and forget');
 
         if( acknowledge || !runner ){
-            this.emit('info', 'Acknowledgeing');
+            this.emit('info', 'Acknowledgeing fireAndForget', request);
             return request.acknowledge();
         }
-        this.emit('info', 'No acknowledge');
+        this.emit('info', 'No acknowledge fireAndForget', request);
         return request.acknowledge(new Error());
     }
 

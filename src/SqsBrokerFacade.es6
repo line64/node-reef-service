@@ -57,7 +57,7 @@ export default class SqsBrokerFacade extends EventEmitter{
     }
 
     let request = this._buildRequestDto(message, done);
-
+    
     this.emit('request', request);
 
   }
@@ -92,7 +92,7 @@ export default class SqsBrokerFacade extends EventEmitter{
         break;
 
       default:
-          this.emit('error', `Unrecognized reefDialect: `, message.MessageAttributes.reefDialect.StringValue);
+          this.emit('warn', `Unrecognized reefDialect: `, message.MessageAttributes.reefDialect.StringValue);
           return;
     }
 
@@ -112,7 +112,7 @@ export default class SqsBrokerFacade extends EventEmitter{
     });
 
     consumer.on('error', err => {
-      this.emit('error', err ? err : new Error("UNKNOWN_ERROR"));
+      this.emit('warn', err ? err : new Error("UNKNOWN_CONSUMER_ERROR"));
     });
 
     return consumer;
