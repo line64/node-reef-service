@@ -61,6 +61,31 @@ module.exports = function() {
 
   });
 
+  service.addRunner('error-no-acknowledge-explicit', (params) => {
+
+    let error = new Error('No Acknowledge');
+    error.acknowledge = false;
+
+    throw error;
+
+  });
+
+  service.addRunner('error-yes-acknowledge-explicit', (params) => {
+
+    let error = new Error('Acknowledge');
+    error.acknowledge = true;
+
+    throw error;
+  });
+
+  service.addRunner('error-yes-acknowledge-implicit', (params) => {
+
+    throw new Error('Aacknowledge');
+
+  });
+
+
+
   service.addResolver('return-null-response-resolver', (params) => {
 
     return new Promise((resolve, reject) => {
@@ -91,7 +116,7 @@ module.exports = function() {
   service.addRunner('no-return-response-runner', (params) => {
 
     return;
-    
+
   });
 
 

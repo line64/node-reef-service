@@ -91,7 +91,8 @@ export default class ReefService extends EventEmitter {
     let runner = this._runners[request.commandType];
 
     let status,
-        payload;
+        payload,
+        acknowledge = true;
 
     try{
         if (!runner) {
@@ -105,15 +106,18 @@ export default class ReefService extends EventEmitter {
     catch(err){
         this.emit('warn',`Error in runner: `, err);
         payload = err;
+        acknowledge = err.acknowledge == false ? false : true ;
         status = ResponseStatus.INTERNAL_ERROR;
     }
 
     if ( request.receiptType == ReceiptType.FIRE_AND_FORGET){
         this.emit('info', 'Processing fire and forget');
 
-        if( status == ResponseStatus.SUCCESS || !runner ){
+        if( acknowledge || !runner ){
+            this.emit('info', 'Acknowledgeing');
             return request.acknowledge();
         }
+        this.emit('info', 'No acknowledge');
         return request.acknowledge(new Error());
     }
 

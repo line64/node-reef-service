@@ -17,6 +17,11 @@ const RETURN_UNDEFINED_RESPONSE_RESOLVER = 'return-undefined-response-resolver';
 const NO_RETURN_RESPONSE_RESOLVER = 'no-return-response-resolver';
 const NO_RETURN_RESPONSE_RUNNER = 'no-return-response-runner';
 
+const ERROR_NO_ACKNOWLEDGE_EXPLICIT = 'error-no-acknowledge-explicit';
+const ERROR_YES_ACKNOWLEDGE_EXPLICIT = 'error-yes-acknowledge-explicit';
+const ERROR_YES_ACKNOWLEDGE_IMPLICIT = 'error-yes-acknowledge-implicit';
+
+
 describe('Service', function() {
 
   var client;
@@ -119,8 +124,48 @@ describe('Service', function() {
       .catch(function(error) {
         done(assert.equal("Empty response", error.message));
       });
+
+    });
+  });
+
+  describe('Fire and forgets', function() {
+    it('Runner no acknowledge implicit', function(done) {
+      client.fireAndForget(SERVICE_DOMAIN, SERVICE_LANE, ERROR_YES_ACKNOWLEDGE_IMPLICIT, '' )
+      .then(function() {
+        setTimeout(function () {
+          done();
+        }, 5000);
+      })
+      .catch(function(error) {
+        done(error);
+      });
     });
 
+
+    it('Runner no acknowledge explicit', function(done) {
+      client.fireAndForget(SERVICE_DOMAIN, SERVICE_LANE, ERROR_NO_ACKNOWLEDGE_EXPLICIT, '' )
+      .then(function() {
+        setTimeout(function () {
+          done();
+        }, 5000);
+      })
+      .catch(function(error) {
+        done(error);
+      });
+    });
+
+
+    it('Runner yes acknowledge explicit', function(done) {
+      client.fireAndForget(SERVICE_DOMAIN, SERVICE_LANE, ERROR_YES_ACKNOWLEDGE_EXPLICIT, '' )
+      .then(function() {
+        setTimeout(function () {
+          done();
+        }, 5000);
+      })
+      .catch(function(error) {
+        done(error);
+      });
+    });
 
   });
 
