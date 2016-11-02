@@ -57,6 +57,7 @@ export default class SqsBrokerFacade extends EventEmitter{
     }
 
     let request = this._buildRequestDto(message, done);
+
     this.emit('request', request);
 
   }
@@ -91,7 +92,7 @@ export default class SqsBrokerFacade extends EventEmitter{
         break;
 
       default:
-          this.emit('error', 'Unrecognized reefDialect');
+          this.emit('error', `Unrecognized reefDialect: `, message.MessageAttributes.reefDialect.StringValue);
           return;
     }
 
@@ -110,8 +111,8 @@ export default class SqsBrokerFacade extends EventEmitter{
       handleMessage: (message, done) => { this._handleRequestMessage(message, done); }
     });
 
-    consumer.on('error', function (err) {
-      this.emit('error', err ? err.message : "UNKNOWN_ERROR");
+    consumer.on('error', err => {
+      this.emit('error', err ? err : new Error("UNKNOWN_ERROR"));
     });
 
     return consumer;
@@ -137,7 +138,7 @@ export default class SqsBrokerFacade extends EventEmitter{
 
         });
     }
-    
+
     return this._producers[queueName];
 
   }
@@ -174,8 +175,8 @@ export default class SqsBrokerFacade extends EventEmitter{
 
     let responseProducer = await this._setupResponseProducer(response.domain, response.lane);
 
-    return new Promise((resolve, reject) => {
-      responseProducer.send([message], function(err) {
+    return new Promise( (resolve, reject) => {
+      responseProducer.send([message], (err) => {
         if (err) reject(err);
         resolve();
       });

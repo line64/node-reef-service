@@ -19,11 +19,11 @@ export default class ReefService extends EventEmitter {
 
   setup() {
 
-    this._brokerFacade.on('request', (req) => this._onRequest(req));
+    this._brokerFacade.on('request', req => this._onRequest(req));
 
-    this._brokerFacade.on('info', (info) => this.emit('info', {Facade: info}));
+    this._brokerFacade.on('info', info => this.emit('info', {Facade: info}));
 
-    this._brokerFacade.on('error', (error) => this.emit('error', {Facade: error}));
+    this._brokerFacade.on('error', error => this.emit('warn', {Facade: error}));
 
     return this._brokerFacade.setup();
 
@@ -59,25 +59,26 @@ export default class ReefService extends EventEmitter {
 
     try{
         if (!resolver) {
-            this.emit('info', 'No resolver found for query type');
+            this.emit('warn', `No resolver found for query`, request.queryType);
             throw {message: 'No resolver found for query type'};
         }
         response.payload = await resolver(request.payload, this);
+        if(!response.payload) throw {message: 'Empty response'};
         response.status = ResponseStatus.SUCCESS;
     }
     catch(err){
-        this.emit('error','Warning - Error in resolver');
+        this.emit('warn',`Error in resolver`, err);
         response.payload = err;
         response.status = ResponseStatus.INTERNAL_ERROR;
     }
 
-    this.emit('info', `Response built for: ${JSON.stringify(request)}`);
-    this.emit('info', `Response built: ${JSON.stringify(response)}`);
+    this.emit('trace', `Request: `, request);
+    this.emit('trace', `Response: `, response);
 
-    this.emit('info', 'Enqueing response');
+    this.emit('info', `Enqueing response for lane: `, `${request.replyToDomain}-${request.replyToLane}`);
     await this._brokerFacade.enqueueResponse(response);
 
-    this.emit('info', 'Acknoledging request');
+    this.emit('info', `Acknoledging request uid: `, request.uid);
 
     request.acknowledge();
 
@@ -94,15 +95,15 @@ export default class ReefService extends EventEmitter {
 
     try{
         if (!runner) {
-            this.emit('info', 'No runner found for command type');
+            this.emit('warn', `No runner found for command type: `, request.commandType);
             throw {message: 'No runner found for command type'};
         }
         payload = await runner(request.payload, this);
+        if(!payload) throw {message: 'Empty response'};
         status = ResponseStatus.SUCCESS;
     }
     catch(err){
-        this.emit('error','Warning - Error in resolver');
-        this.emit('error',err);
+        this.emit('warn',`Error in runner: `, err);
         payload = err;
         status = ResponseStatus.INTERNAL_ERROR;
     }
@@ -126,14 +127,13 @@ export default class ReefService extends EventEmitter {
       status: status
     };
 
-    this.emit('info', `Response built for request: ${JSON.stringify(request)}`);
-    this.emit('info', `Response built: ${JSON.stringify(response)}`);
+    this.emit('trace', `Request: `, request);
+    this.emit('trace', `Response: `, response);
 
-
-    this.emit('info', 'Enqueing response');
+    this.emit('info', `Enqueing response for lane: `, `${request.replyToDomain}-${request.replyToLane}`);
     await this._brokerFacade.enqueueResponse(response);
 
-    this.emit('info', 'Acknoledging request');
+    this.emit('info', `Acknoledging request uid: `, request.uid);
 
     request.acknowledge();
 
@@ -155,7 +155,8 @@ export default class ReefService extends EventEmitter {
         break;
 
       default:
-        throw new Error('Cant understand reef dialog');
+
+        this.emit('warn', new Error(`Cant understand reef dialog: ${request.reefDialect}`));
 
     }
   }

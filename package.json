@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "babel -d ./dist ./src",
     "test2": "npm run compile && babel-node test/service.js",
-    "test": "mocha test/*"
+    "test": "mocha --timeout 15000 ./test/run"
   },
   "repository": {
     "type": "git",
@@ -34,6 +34,9 @@
     "babel-polyfill": "^6.3.14",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
-    "dotenv": "^2.0.0"
+    "chai": "^3.5.0",
+    "dotenv": "^2.0.0",
+    "mocha": "^3.1.2",
+    "reef-client": "^1.0.0-beta.6"
   }
 }
