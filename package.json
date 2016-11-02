@@ -5,7 +5,6 @@
   "main": "dist/index.js",
   "scripts": {
     "compile": "babel -d ./dist ./src",
-    "test2": "npm run compile && babel-node test/service.js",
     "test": "mocha --timeout 15000 ./test/run"
   },
   "repository": {
